@@ -132,7 +132,7 @@ export default function VotingApp() {
 				transition={{ duration: 0.5 }}
 			>
 				<h1 className="text-2xl sm:text-4xl font-bold mb-3 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-					Pemilihan Ketua dan Wakil Ketua
+					Pemilihan Presiden Mahasiswa dan Wakil Presiden Mahasiswa
 				</h1>
 
 				<h2 className="text-xl sm:text-2xl font-semibold mb-3 text-center text-gray-700">Pilih Pasangan:</h2>
