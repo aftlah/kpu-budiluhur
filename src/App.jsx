@@ -260,12 +260,12 @@
 // 	)
 // }
 
-'use client'
 
 import { useState, useEffect } from 'react'
 import { ChevronRight, UserCheck, Lock, Mail, Key } from 'lucide-react'
 import Swal from 'sweetalert2'
 import { motion, AnimatePresence } from 'framer-motion'
+import toast, { Toaster } from 'react-hot-toast'
 
 const candidates = [
   { id: 1, name: 'Alice Johnson', nim: '12345678', role: 'Ketua', photo: 'https://via.placeholder.com/100' },
@@ -278,6 +278,8 @@ const options = [
   { id: 1, ketua: candidates[0], wakil: candidates[1] },
   { id: 2, ketua: candidates[2], wakil: candidates[3] },
 ]
+
+const isAdmin = ['2311500017@student.budiluhur.ac.id','2311500942@student.budiluhur.ac.id'];
 
 export default function AuthenticatedVotingApp() {
   const [selectedOption, setSelectedOption] = useState(null)
@@ -301,19 +303,19 @@ export default function AuthenticatedVotingApp() {
   }, [])
 
   const handleAuthentication = () => {
-    if (email && secretCode === 'secret123') {
+    const emailPattern = /^[0-9]+@student\.budiluhur\.ac\.id$/;
+    if (emailPattern.test(email) && secretCode === '123') {
       setIsAuthenticated(true)
     } else {
       Swal.fire({
-        title: 'Authentication Failed',
-        text: 'Invalid email or secret code.',
+        title: 'Login Gagal',
+        text: 'Email atau kode rahasia tidak valid. Pastikan login menggunakan email Budi Luhur.',
         icon: 'error',
-        confirmButtonText: 'Try Again',
+        confirmButtonText: 'Coba Lagi',
         customClass: {
           container: '!font-sans',
           title: '!text-lg sm:!text-xl !font-bold !text-red-600',
           htmlContainer: '!text-sm sm:!text-base !text-gray-600',
-          confirmButton: '!bg-red-600 !text-white !px-4 !py-2 !rounded-lg !font-semibold !text-sm hover:!bg-red-700'
         }
       })
     }
@@ -344,6 +346,17 @@ export default function AuthenticatedVotingApp() {
             setVoteCount(newVoteCount)
             localStorage.setItem('voteCount', JSON.stringify(newVoteCount))
             localStorage.setItem('hasVoted', 'true')
+
+            // Show toast notification
+            toast.success('Suara anda telah terkirim', {
+              duration: 3000,
+              position: 'top-right',
+              style: {
+                background: '#4CAF50',
+                color: '#fff',
+                fontWeight: 'bold',
+              },
+            })
 
             Swal.fire({
               title: 'Suara Anda Telah Diterima!',
@@ -404,7 +417,11 @@ export default function AuthenticatedVotingApp() {
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      handleShowResults();
+      if(isAuthenticated){
+        handleShowResults();
+      }else{
+        handleAuthentication();
+      }
     }
   }
 
@@ -415,6 +432,7 @@ export default function AuthenticatedVotingApp() {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-blue-100 to-purple-100">
+      <Toaster />
       <motion.div
         className="w-full max-w-2xl px-4 py-5 bg-white shadow-xl sm:px-8 rounded-2xl"
         initial={{ opacity: 0, y: 20 }}
@@ -431,7 +449,7 @@ export default function AuthenticatedVotingApp() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="mb-3 text-xl font-semibold text-center text-gray-700 sm:text-2xl">Autentikasi</h2>
+            <h2 className="mb-3 text-xl font-semibold text-center text-gray-700 sm:text-2xl">Login</h2>
             <div className="space-y-4">
               <div>
                 <label htmlFor="email" className="block mb-1 text-sm font-medium text-gray-700">Email</label>
@@ -454,7 +472,9 @@ export default function AuthenticatedVotingApp() {
                     type="password"
                     id="secretCode"
                     value={secretCode}
+                    onKeyUp={handleKeyPress}
                     onChange={(e) => setSecretCode(e.target.value)}
+                    
                     className="w-full p-3 pl-10 transition-all duration-300 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter the secret code"
                   />
@@ -466,7 +486,7 @@ export default function AuthenticatedVotingApp() {
                 className="flex items-center justify-center w-full px-6 py-3 text-base font-semibold text-white transition-all duration-300 transform rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 sm:text-lg hover:from-blue-700 hover:to-purple-700 hover:scale-105"
               >
                 <Lock className="w-5 h-5 mr-2 sm:h-6 sm:w-6" />
-                Authenticate
+                Masuk
               </button>
             </div>
           </motion.div>
@@ -522,14 +542,14 @@ export default function AuthenticatedVotingApp() {
               Pilih
             </button>
 
-            {!showResults && (
+            {!showResults && isAdmin.includes(email) && (
               <motion.div
                 className="pt-6 mt-6 border-t border-gray-200"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <h3 className="mb-2 text-base font-semibold text-gray-700 sm:text-lg">Lihat    Hasil</h3>
+                <h3 className="mb-2 text-base font-semibold text-gray-700 sm:text-lg">Lihat Hasil</h3>
                 <div className="flex flex-col items-center space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
                   <input
                     type="password"
