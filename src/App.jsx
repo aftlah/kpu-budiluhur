@@ -1,4 +1,4 @@
-
+'use client'
 
 import { useState, useEffect } from 'react'
 import { ChevronRight, UserCheck, Lock, Mail, Key, LogOut } from 'lucide-react'
@@ -20,7 +20,7 @@ const options = [
 
 const isAdmin = ['2311500017@student.budiluhur.ac.id', '2311500942@student.budiluhur.ac.id'];
 
-export default function Component() {
+export default function App() {
     const [selectedOption, setSelectedOption] = useState(null)
     const [voteCount, setVoteCount] = useState({ option1: 0, option2: 0 })
     const [hasVoted, setHasVoted] = useState(false)
@@ -42,13 +42,14 @@ export default function Component() {
     }, [])
 
     const handleAuthentication = () => {
-        const emailPattern = /^[0-9]+@student\.budiluhur\.ac\.id$/;
-        if (emailPattern.test(email) && secretCode === '123') {
+        const emailPattern = /^(\d{10})@student\.budiluhur\.ac\.id$/;
+        const match = email.match(emailPattern);
+        if (match && match[1].length === 10 && secretCode === '123') {
             setIsAuthenticated(true)
         } else {
             Swal.fire({
                 title: 'Login Gagal',
-                text: 'Email atau kode rahasia tidak valid. Pastikan login menggunakan email Budi Luhur.',
+                text: 'Email atau kode rahasia tidak valid. Pastikan login menggunakan email Budi Luhur dengan NIM 10 digit.',
                 icon: 'error',
                 confirmButtonText: 'Coba Lagi',
                 customClass: {
@@ -176,7 +177,7 @@ export default function Component() {
         loginInitial: { opacity: 0, x: '100%' },
         loginAnimate: { opacity: 1, x: 0 },
         loginExit: { opacity: 0, x: '-100%' },
-        
+
         votingInitial: { opacity: 0, x: '100%' },
         votingAnimate: { opacity: 1, x: 0 },
         votingExit: { opacity: 0, x: '-100%' }
@@ -261,25 +262,27 @@ export default function Component() {
                             <h1 className="mb-3 text-2xl font-bold text-center text-transparent sm:text-3xl bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                                 Pemilihan Presiden Mahasiswa dan Wakil Presiden Mahasiswa
                             </h1>
-                            <div className="flex justify-end mb-4">
-                                <motion.button
-                                    onClick={handleLogout}
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-300 bg-red-500 rounded-md hover:bg-red-600"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <LogOut className="w-4 h-4 mr-2" />
-                                    Logout
-                                </motion.button>
-                            </div>
+                            {isAdmin.includes(email) && (
+                                <div className="flex justify-end mb-4">
+                                    <motion.button
+                                        onClick={handleLogout}
+                                        className="flex items-center px-4 py-2 text-sm font-medium text-white transition-colors duration-300 bg-red-500 rounded-md hover:bg-red-600"
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <LogOut className="w-4 h-4 mr-2" />
+                                        Logout
+                                    </motion.button>
+                                </div>
+                            )}
                             <h2 className="mb-3 text-xl font-semibold text-center text-gray-700 sm:text-2xl">Pilih Pasangan:</h2>
                             <div className="space-y-4 sm:space-y-6">
                                 {options.map((option) => (
                                     <motion.label
                                         key={option.id}
                                         className={`flex flex-col sm:flex-row items-center sm:space-x-4 p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${selectedOption === option.id
-                                                ? 'border-blue-500 bg-blue-50 shadow-md transform scale-105'
-                                                : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
+                                            ? 'border-blue-500 bg-blue-50 shadow-md transform scale-105'
+                                            : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
                                             }`}
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
@@ -291,7 +294,6 @@ export default function Component() {
                                             checked={selectedOption === option.id}
                                             onChange={() => setSelectedOption(option.id)}
                                             className="sr-only"
-
                                         />
                                         <div className="flex flex-col items-start justify-between flex-1 space-y-4 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
                                             {[option.ketua, option.wakil].map((candidate) => (
